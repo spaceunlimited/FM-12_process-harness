@@ -2,9 +2,10 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { EXPECTED } from './lib.mjs';
+import { EXPECTED, MINE } from './lib.mjs';
 
-const HARNESS_PATHS = ['.claude/', 'BRIEF.md', 'process/'];
+const HARNESS_PATHS = ['.claude/', 'process/'];                       // plus any round's BRIEF (see isHarness)
+const isHarness = (p) => HARNESS_PATHS.some((h) => p === h || p.startsWith(h)) || MINE.test(p);
 const YOURS = ['src/experience/', 'public/', 'tools/'];               // the student's areas: changes here are the work, not a problem
 const row = (tag, text) => `  ${tag.padEnd(8)} ${text}\n`;
 
@@ -16,8 +17,7 @@ function git(root) {
   let harnessUntracked = false;
   for (const line of r.stdout.split('\n').filter(Boolean)) {
     const code = line.slice(0, 2), p = line.slice(3).replace(/^"|"$/g, '').split(' -> ').pop();
-    const harness = HARNESS_PATHS.some((h) => p === h || p.startsWith(h));
-    if (harness) { if (code === '??') harnessUntracked = true; }                   // harness files: untracked or committed, both fine
+    if (isHarness(p)) { if (code === '??') harnessUntracked = true; }              // harness files: untracked or committed, both fine
     else if (code === '??') { if (YOURS.some((y) => p.startsWith(y))) yours.push(p); else other.push(p); }
     else if (YOURS.some((y) => p.startsWith(y))) yours.push(p);
     else changed.push(p);
@@ -35,12 +35,18 @@ export function report(root, s) {
     if (!ok) problems++;
     out += row(ok ? 'ok' : 'MISSING', rel);
   }
-  out += 'brief & plan\n';
-  if (!s.brief.exists) { problems++; out += row('MISSING', 'BRIEF.md'); }
-  else out += row('', `brief ${s.brief.filled}/${s.brief.total}` +
-    (s.brief.missing.length ? ` · empty: ${s.brief.missing.join(', ')}` : '') +
-    ` · ${!s.plan.exists ? 'no plan yet' : s.plan.complete ? `plan complete (${s.plan.total} steps)` : `plan ${s.plan.done}/${s.plan.total} done`}` +
-    ` · gate: ${s.plan.exists ? 'silent (plan exists)' : s.brief.gateOff ? 'OFF (Brief gate: off)' : 'on'}`);
+  out += 'rounds\n';
+  if (!s.rounds[0].brief.exists) { problems++; out += row('MISSING', 'BRIEF.md'); }
+  for (const r of s.rounds) {
+    const planPart = !r.plan.exists ? 'no plan yet'
+      : r.plan.complete ? `plan complete (${r.plan.total} rows)` : `plan ${r.plan.done}/${r.plan.total} done`;
+    out += row(r.n === s.round ? 'now' : '', r.brief.exists
+      ? `round ${r.n}  (${r.briefRel})  brief ${r.brief.filled}/${r.brief.total}` +
+        (r.brief.missing.length ? ` · empty: ${r.brief.missing.join(', ')}` : '') + ` · ${planPart}`
+      : `round ${r.n}  ${r.briefRel} is not there  · ${planPart}`);
+  }
+  out += row('', `gate: ${s.rounds[0].plan.exists ? 'silent for good (round 1 has a plan)'
+    : s.rounds[0].brief.gateOff ? 'OFF (Brief gate: off)' : 'on (src/ waits for the round 1 brief)'}`);
   out += 'template\n'
     + row(s.templateClaudeMd ? 'ok' : 'MISSING', 'CLAUDE.md')
     + row(s.caps ? 'ok' : 'MISSING', `CAPABILITIES.md${s.caps ? `  (${s.caps.length} blocks)` : ''}`)
@@ -62,7 +68,7 @@ export function report(root, s) {
     } else out += row('ok', 'no template file is modified (outside src/experience/, public/, tools/)');
     out += row('ok', g.harnessUntracked ? 'harness files untracked: .claude/, BRIEF.md, process/  (committed with the first logged step)'
                                         : 'harness files committed or unchanged');
-    out += row('', `${g.stepCommits} step commit(s)  (one per logged step: "Step k: <name>")`);
+    out += row('', `${g.stepCommits} step commit(s)  (one per logged step: "Step <round>.<k>: <name>")`);
     if (g.yours.length) out += row('yours', `src/experience/, public/, tools/: ${g.yours.length} file(s) changed  (your demo; expected)`);
     if (g.other.length) out += row('note', `other untracked files: ${g.other.join(', ')}  (not from the harness)`);
   }

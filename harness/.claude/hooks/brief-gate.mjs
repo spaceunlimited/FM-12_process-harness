@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-// PreToolUse (Edit|Write|MultiEdit|NotebookEdit). The gate only exists before the plan:
+// PreToolUse (Edit|Write|MultiEdit|NotebookEdit). The gate only exists before the first plan:
 // while process/PLAN.md does not exist, edits under src/ wait for the five required brief sections.
+// It is deliberately round 1 only. A later round's brief is held by /round and the session-start line,
+// not by this hook: re-arming it would refuse a legitimate tweak to a built demo while the next brief
+// is half-written. One hard gate, taught once (process/WHY.md).
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { projectRoot, readText, parseBrief, isUnderSrc, readStdinJson } from './lib.mjs';

@@ -1,9 +1,13 @@
-# Brief
+# Brief, round 1
 
 Your design decisions, in your words. Write it before you build, with whatever helps you (notes from
 the concepting workshop, another assistant, a friend). Claude reads it, plays it back, asks about
 anything vague or missing, and then writes a plan with you. Change the brief whenever a test teaches
 you something.
+
+This is round 1: this brief, a plan that ends in a polish pass, and the steps between. When that plan is
+done the demo is presentable, and `/round` opens round 2 as a shorter brief in its own file (`BRIEF-2.md`)
+that extends this one. This file stays as it is. The stack of briefs is the record of how the idea grew.
 
 Unfilled sections show "> (your answer)". Until a plan exists, edits under src/ wait for the first five
 sections. To build without them, change the next line to "Brief gate: off".

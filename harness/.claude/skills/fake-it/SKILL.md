@@ -26,7 +26,7 @@ what the student tells visitors afterwards ("the noticing was a timer"). Honesty
 part of the method.
 
 Files generated once with an outside service are still a fake: the headset plays or shows a file.
-Before the first call, ask which fidelity this round is for (draft or final) and what each costs; the
+Before the first call, ask which fidelity this batch is for (draft or final) and what each costs; the
 key stays with the student (see "Assets made with an outside service" in `.claude/CLAUDE.md`).
 
 A real model call (`ai.mode = 'live'`) is a confirmation point: state the cost in time and what it

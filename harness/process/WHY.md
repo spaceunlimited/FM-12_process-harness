@@ -1,12 +1,12 @@
 # Why these guardrails
 
 Every rule in this harness came from something that went wrong in a real session: two dry runs of the
-planet demo (phone, then Quest 3), an earlier, heavier version of this harness, and a full nine-step run
-of v1.0 on the Quest. Each paragraph below is one friction, what we added, and what we dropped. Read it
-to decide which parts to keep in your own.
+planet demo (phone, then Quest 3), an earlier, heavier version of this harness, a full nine-step run
+of v1.0 on the Quest, and teaching the v1.1 process. Each paragraph below is one friction, what we added,
+and what we dropped. Read it to decide which parts to keep in your own.
 
-**"nice!" as a test report.** Students answered verification cards with one word. We added the verify
-card's "look for" list (three observations about reach, timing, expectation) and dropped every question
+**"nice!" as a test report.** Students answered handovers with one word. We added the handover's
+"look for" list (three observations about reach, timing, expectation) and dropped every question
 answerable with a polite yes. Observation, not verdict: the student's eyes are the only sensor Claude
 does not have.
 
@@ -36,6 +36,12 @@ Replaced with a marker: a section is filled when `> (your answer)` is gone. Dete
 
 **"Beat".** Screenwriting jargon that designers read as tempo. It is a step: one moment a person can try.
 
+**"Card".** The block of text that ends a build turn used to be called the verify card, and the word
+made students look for a thing: a file, a panel, something to open. There is no thing. What happens is
+that Claude stops building and hands the work to you with instructions for looking at it. So it is a
+**handover**, which names the moment and the transfer instead of an object. `/verify` is still the skill
+that writes it, because that is the verb for what you then do.
+
 **Claude skipping the brief under "just build it".** A rule in a memory file is advice; under pressure it
 bends. The brief gate is a hook: it refuses edits under `src/` until the five sections exist, then falls
 silent for good once the plan is there. This is the one place where enforcing was worth it, and the one
@@ -50,29 +56,32 @@ trigger replies. The template does not have one, and the process should not depe
 works with what exists: scripted replies, timers, hidden triggers, a helper in the room.
 
 **Trees nobody could see.** For one whole "built and verified" step the planet's trees sat inside the
-globe. The check passed, the page booted, the card went out. Claude had no eyes. Rule 4 now starts with
-`npm run screenshot` and a look at the image before any card: a pre-check that a thing is visible, never
-a substitute for the room. The template's `npm run check` also used to skip `src/experience/`, so
-"check passes" was true of the engine only; the template fixed that and the card now says what it checked.
+globe. The check passed, the page booted, the handover went out. Claude had no eyes. Rule 4 now starts
+with `npm run screenshot` and a look at the image before any handover: a pre-check that a thing is
+visible, never a substitute for the room. The template's `npm run check` also used to skip
+`src/experience/`, so "check passes" was true of the engine only; the template fixed that and the
+handover now says what it checked.
 
 **"Fix the thing you just reported, and build the next step."** Half the turns in the v1.0 run were
 this, and the rule said "never two steps in one turn". The log already had the answer: entries carried
 "Also:" and "Then:" lines for corrections. So the invariant changed from one step per turn to one new
-thing to judge per card. A tweak corrects something already judged; it rides along as a "Tweaked" line.
+thing to judge per handover. A tweak corrects something already judged; it rides along as a "Tweaked"
+line.
 
-**Three agents, three steps' worth of change, one card.** A deliberate polish pass that rule 3 could
+**Three agents, three steps' worth of change, one handover.** A deliberate polish pass that rule 3 could
 only forbid or ignore. We first wrote a `/leap` skill for it, then noticed it changed nothing about how
 the agent works, only what it is allowed to bundle. So it became a clause in rule 3: a bundled step
-lists its items and what must not change before the yes, and its card asks whether the whole still
-feels the same, only better. The single card, the log entry and the commit do not relax.
+lists its items and what must not change before the yes, and its handover asks whether the whole still
+feels the same, only better. The single handover, the log entry and the commit do not relax.
 
 **No commits for a whole demo.** Nine steps on the Quest and `git status` showed everything untracked.
 `/log` now commits each logged step as `Step k: <name>`, so every step is a place to go back to and the
 history is the story of the design. Never a push unasked.
 
-**"Runs smooth" as the answer to three questions.** The card asked about reach, band width and timing;
+**"Runs smooth" as the answer to three questions.** The handover asked about reach, band width and
+timing;
 the report answered performance, and the questions were lost. Unanswered "look for" lines are logged as
-"Unreported" and return on the next card as "Still open".
+"Unreported" and return on the next handover as "Still open".
 
 **The plan ended and nothing said so.** The last planned step was logged like any other; the student
 kept going, well, but with no signal that the training wheels were off. The plan now has a complete
@@ -80,7 +89,7 @@ state, the session-start line says so, and Claude names what comes after: a twea
 with the numbering continuing, a polish bundle, `/retro`, and the brief sentences the headset now
 contradicts.
 
-**The critic.** A read-only agent that restated generic risks the card's "I am not sure about" line
+**The critic.** A read-only agent that restated generic risks the handover's "I am not sure about" line
 already covered. Gone. `/retro` replaced it: it reads the log's "repeated or corrected" lines back as
 the rules the student has already been teaching, which is the course's actual goal.
 
@@ -100,6 +109,29 @@ conversation. Rule 7 now says what it meant: one new table row and a one-sentenc
 **The brief drifted.** The plan is a living document; the brief described an idea three tests old. Not
 nagging about it per step, but at plan completion and in `/retro` Claude names the sentences the
 headset contradicts and offers to update them in the student's words.
+
+**The plan ended and the project didn't.** v1.1 learned to say "the plan is complete", and then offered
+more rows: a new step the student sizes, numbering continuing in a table that no longer described what
+they were building. In teaching it showed as drift. Either students stopped, because nothing said what
+came next, or they kept appending to a stale plan. v1.2 names the unit instead: a **round** is one brief,
+one plan, and the steps between, and it ends. The next round is a new, shorter brief in its own file that
+extends the previous one, so the stack of briefs becomes the record of how the idea grew, and its steps
+can be bigger because the student has now seen their own demo in the room half a dozen times. The loop
+inside a round did not change at all; only how far a step is allowed to reach.
+
+**"Complete" that still looked like a prototype.** If a round ends with its last feature, the demo is
+finished in the plan and unfinished in the room. So every plan now carries a final row: the polish pass,
+built as a bundle (list the changes, agree what must not change, one handover). It costs one row and makes
+"round complete" mean something a student can show someone. It is also the row the brief's "what must not
+change" is checked against.
+
+**The gate we chose not to re-arm.** The obvious move was to make the `src/` hook refuse edits again at
+the start of every round. We did not. Between two rounds there is always a built demo that may need a
+small fix, and a brief that is half-written; a gate there refuses the one thing the student legitimately
+wants. The brief of a later round is held by `/round`, by the session-start line and by rule 1: advice,
+not enforcement. One hard gate, once, at the only moment where "just build it" would otherwise win.
+Which is the lesson of this file in one paragraph: enforce the thing that a rule cannot hold, and nothing
+else.
 
 The two things this harness exists to teach: a harness adds a *process*, and different projects need
 different ones; and slowing down instead of one-shotting is what makes room for a better idea. If a rule

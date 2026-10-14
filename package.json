@@ -1,6 +1,6 @@
 {
   "name": "fm12-process-harness",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Installer for the FM-12 process harness: copies harness/ into the XR sandbox template, never overwrites",
   "type": "module",
   "private": true,
